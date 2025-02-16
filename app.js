@@ -1,160 +1,137 @@
-import java.util.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+// Numeroloji Hesaplama Fonksiyonu
+const calculateNumerology = (name) => {
+  const numerologyMap = {
+    A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9, J: 1, K: 2, L: 3, M: 4, N: 5, O: 6, P: 7, Q: 8, R: 9, S: 1, T: 2, U: 3, V: 4, W: 5, X: 6, Y: 7, Z: 8,
+  };
 
-public class NumerologyAnalyzer {
+  let total = [...name.toUpperCase()].reduce((acc, char) => acc + (numerologyMap[char] || 0), 0);
 
-    public static int calculateNumerology(String name) {
-        name = name.toUpperCase();
-        Map<Character, Integer> numerologyMap = new HashMap<>();
-        numerologyMap.put('A', 1);
-        numerologyMap.put('B', 2);
-        numerologyMap.put('C', 3);
-        numerologyMap.put('D', 4);
-        numerologyMap.put('E', 5);
-        numerologyMap.put('F', 6);
-        numerologyMap.put('G', 7);
-        numerologyMap.put('H', 8);
-        numerologyMap.put('I', 9);
-        numerologyMap.put('J', 1);
-        numerologyMap.put('K', 2);
-        numerologyMap.put('L', 3);
-        numerologyMap.put('M', 4);
-        numerologyMap.put('N', 5);
-        numerologyMap.put('O', 6);
-        numerologyMap.put('P', 7);
-        numerologyMap.put('Q', 8);
-        numerologyMap.put('R', 9);
-        numerologyMap.put('S', 1);
-        numerologyMap.put('T', 2);
-        numerologyMap.put('U', 3);
-        numerologyMap.put('V', 4);
-        numerologyMap.put('W', 5);
-        numerologyMap.put('X', 6);
-        numerologyMap.put('Y', 7);
-        numerologyMap.put('Z', 8);
+  while (total > 9 && ![11, 22, 33].includes(total)) {
+    total = [...String(total)].reduce((acc, digit) => acc + parseInt(digit), 0);
+  }
 
-        int total = 0;
-        for (char c : name.toCharArray()) {
-            if (Character.isLetter(c)) {
-                total += numerologyMap.getOrDefault(c, 0);
-            }
-        }
+  return total;
+};
 
-        while (total > 9 && total != 11 && total != 22 && total != 33) {
-            int sum = 0;
-            int num = total;
-            while (num > 0) {
-                sum += num % 10;
-                num /= 10;
-            }
-            total = sum;
-        }
-        return total;
-    }
+// BurÃ§ Hesaplama Fonksiyonu
+const getZodiacSign = (day, month) => {
+  const cutoffs = [120, 219, 320, 420, 521, 621, 722, 823, 923, 1023, 1122, 1222, 1231];
+  const signs = ['OÄŸlak', 'Kova', 'BalÄ±k', 'KoÃ§', 'BoÄŸa', 'Ä°kizler', 'YengeÃ§', 'Aslan', 'BaÅŸak', 'Terazi', 'Akrep', 'Yay', 'OÄŸlak'];
 
-    public static String getZodiacSign(int day, int month) {
-        int[] cutoffs = {120, 219, 320, 420, 521, 621, 722, 823, 923, 1023, 1122, 1222, 1231};
-        String[] signs = {"Oðlak", "Kova", "Balýk", "Koç", "Boða", "Ýkizler", "Yengeç", "Aslan", "Baþak", "Terazi", "Akrep", "Yay", "Oðlak"};
-        
-        int dateNumber = month * 100 + day;
-        for (int i = 0; i < cutoffs.length; i++) {
-            if (dateNumber <= cutoffs[i]) {
-                return signs[i];
-            }
-        }
-        return "Oðlak";
-    }
+  const dateNumber = month * 100 + day;
+  return signs[cutoffs.findIndex(cutoff => dateNumber <= cutoff)];
+};
 
-    public static Map.Entry<String, Integer> getPlanetAndLuckyNumber(String zodiac) {
-        Map<String, Map.Entry<String, Integer>> zodiacData = new HashMap<>();
-        zodiacData.put("Koç", new AbstractMap.SimpleEntry<>("Mars", 9));
-        zodiacData.put("Boða", new AbstractMap.SimpleEntry<>("Venüs", 6));
-        zodiacData.put("Ýkizler", new AbstractMap.SimpleEntry<>("Merkür", 5));
-        zodiacData.put("Yengeç", new AbstractMap.SimpleEntry<>("Ay", 2));
-        zodiacData.put("Aslan", new AbstractMap.SimpleEntry<>("Güneþ", 1));
-        zodiacData.put("Baþak", new AbstractMap.SimpleEntry<>("Merkür", 5));
-        zodiacData.put("Terazi", new AbstractMap.SimpleEntry<>("Venüs", 6));
-        zodiacData.put("Akrep", new AbstractMap.SimpleEntry<>("Mars", 9));
-        zodiacData.put("Yay", new AbstractMap.SimpleEntry<>("Jüpiter", 3));
-        zodiacData.put("Oðlak", new AbstractMap.SimpleEntry<>("Satürn", 8));
-        zodiacData.put("Kova", new AbstractMap.SimpleEntry<>("Uranüs", 4));
-        zodiacData.put("Balýk", new AbstractMap.SimpleEntry<>("Neptün", 7));
+// Gezegen ve ÅžanslÄ± NumarasÄ±
+const getPlanetAndLuckyNumber = (zodiac) => {
+  const zodiacData = {
+    KoÃ§: ['Mars', 9], BoÄŸa: ['VenÃ¼s', 6], Ä°kizler: ['MerkÃ¼r', 5], YengeÃ§: ['Ay', 2], Aslan: ['GÃ¼neÅŸ', 1], BaÅŸak: ['MerkÃ¼r', 5], Terazi: ['VenÃ¼s', 6], Akrep: ['Mars', 9], Yay: ['JÃ¼piter', 3], OÄŸlak: ['SatÃ¼rn', 8], Kova: ['UranÃ¼s', 4], BalÄ±k: ['NeptÃ¼n', 7],
+  };
+  return zodiacData[zodiac] || ['Bilinmiyor', 0];
+};
 
-        return zodiacData.getOrDefault(zodiac, new AbstractMap.SimpleEntry<>("Bilinmiyor", 0));
-    }
+// DoÄŸal TaÅŸ Ã–nerileri
+const suggestNaturalStones = (numerology, zodiac) => {
+  const stoneData = {
+    1: ['Elmas', 'Yakut', 'Kuvars'], 2: ['Ay TaÅŸÄ±', 'Ä°nci', 'Akuamarin'], 3: ['Ametist', 'Turmalin', 'Topaz'], 4: ['Kehribar', 'YeÅŸim', 'Obsidyen'], 5: ['Turkuaz', 'Akik', 'Sitrin'], 6: ['Safir', 'ZÃ¼mrÃ¼t', 'Kuvars'], 7: ['Kiyanit', 'Lapis Lazuli', 'Florit'], 8: ['Oniks', 'Kaplan GÃ¶zÃ¼', 'Hematit'], 9: ['Yakut', 'Granat', 'Rodonit'],
+  };
 
-    public static List<String> suggestNaturalStones(int numerology, String zodiac) {
-        Map<Integer, List<String>> stoneData = new HashMap<>();
-        stoneData.put(1, Arrays.asList("Elmas", "Yakut", "Kuvars"));
-        stoneData.put(2, Arrays.asList("Ay Taþý", "Ýnci", "Akuamarin"));
-        stoneData.put(3, Arrays.asList("Ametist", "Turmalin", "Topaz"));
-        stoneData.put(4, Arrays.asList("Kehribar", "Yeþim", "Obsidyen"));
-        stoneData.put(5, Arrays.asList("Turkuaz", "Akik", "Sitrin"));
-        stoneData.put(6, Arrays.asList("Safir", "Zümrüt", "Kuvars"));
-        stoneData.put(7, Arrays.asList("Kiyanit", "Lapis Lazuli", "Florit"));
-        stoneData.put(8, Arrays.asList("Oniks", "Kaplan Gözü", "Hematit"));
-        stoneData.put(9, Arrays.asList("Yakut", "Granat", "Rodonit"));
+  const zodiacStones = {
+    KoÃ§: 'Yakut', BoÄŸa: 'ZÃ¼mrÃ¼t', Ä°kizler: 'Akik', YengeÃ§: 'Ay TaÅŸÄ±', Aslan: 'Elmas', BaÅŸak: 'Sitrin', Terazi: 'Safir', Akrep: 'Topaz', Yay: 'Turkuaz', OÄŸlak: 'Oniks', Kova: 'Akuamarin', BalÄ±k: 'Ametist',
+  };
 
-        Map<String, String> zodiacStones = new HashMap<>();
-        zodiacStones.put("Koç", "Yakut");
-        zodiacStones.put("Boða", "Zümrüt");
-        zodiacStones.put("Ýkizler", "Akik");
-        zodiacStones.put("Yengeç", "Ay Taþý");
-        zodiacStones.put("Aslan", "Elmas");
-        zodiacStones.put("Baþak", "Sitrin");
-        zodiacStones.put("Terazi", "Safir");
-        zodiacStones.put("Akrep", "Topaz");
-        zodiacStones.put("Yay", "Turkuaz");
-        zodiacStones.put("Oðlak", "Oniks");
-        zodiacStones.put("Kova", "Akuamarin");
-        zodiacStones.put("Balýk", "Ametist");
+  const stones = stoneData[numerology] || [];
+  const zodiacStone = zodiacStones[zodiac];
 
-        List<String> stones = new ArrayList<>(stoneData.getOrDefault(numerology, new ArrayList<>()));
-        String zodiacStone = zodiacStones.getOrDefault(zodiac, "");
-        if (!zodiacStone.isEmpty() && !stones.contains(zodiacStone)) {
-            stones.add(zodiacStone);
-        }
-        return stones.subList(0, Math.min(stones.size(), 3));
-    }
+  if (zodiacStone && !stones.includes(zodiacStone)) {
+    stones.push(zodiacStone);
+  }
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Doðal Taþ ve Numeroloji Analizine Hoþ Geldiniz!");
-        System.out.print("Adýnýzý girin: ");
-        String name = scanner.nextLine().trim();
-        System.out.print("Soyadýnýzý girin: ");
-        String surname = scanner.nextLine().trim();
-        System.out.print("Doðum tarihinizi (GG/AA/YYYY) formatýnda girin: ");
-        String birthDateInput = scanner.nextLine().trim();
+  return stones.slice(0, 3);
+};
 
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate birthDate = LocalDate.parse(birthDateInput, formatter);
-            int day = birthDate.getDayOfMonth();
-            int month = birthDate.getMonthValue();
+document.getElementById('birthdate').addEventListener('input', (e) => {
+  let input = e.target.value.replace(/\D/g, '');
+  if (input.length > 2) input = input.slice(0, 2) + '/' + input.slice(2);
+  if (input.length > 5) input = input.slice(0, 5) + '/' + input.slice(5, 9);
 
-            String fullName = name + " " + surname;
-            int numerologyNumber = calculateNumerology(fullName);
-            String zodiacSign = getZodiacSign(day, month);
-            Map.Entry<String, Integer> planetAndLucky = getPlanetAndLuckyNumber(zodiacSign);
-            String planet = planetAndLucky.getKey();
-            int luckyNumber = planetAndLucky.getValue();
-            List<String> stones = suggestNaturalStones(numerologyNumber, zodiacSign);
+  const [day, month, year] = input.split('/').map(Number);
+  if (month > 12) input = input.slice(0, 3);
+  if (day > 31) input = input.slice(0, 2);
 
-            System.out.println("\nAnaliz Sonuçlarý:");
-            System.out.println("Ad Soyad: " + fullName);
-            System.out.println("Doðum Tarihi: " + birthDateInput);
-            System.out.println("Burcunuz: " + zodiacSign);
-            System.out.println("Ýsim Numeroloji Sayýsý: " + numerologyNumber);
-            System.out.println("Uðurlu Sayý: " + luckyNumber);
-            System.out.println("Gezegen: " + planet);
-            System.out.println("Önerilen Doðal Taþlar: " + String.join(", ", stones));
+  e.target.value = input;
+});
 
-        } catch (DateTimeParseException e) {
-            System.out.println("Lütfen geçerli bir doðum tarihi formatý girin (GG/AA/YYYY).");
-        }
-        scanner.close();
-    }
-}
+const checkValue = (str, max) => {
+  let num = parseInt(str);
+  if (isNaN(num) || num <= 0 || num > max) num = 1;
+  return num.toString().padStart(2, '0');
+};
+
+// Form Submit Ä°ÅŸleyici
+document.getElementById('analysisForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const errorMessage = document.getElementById('errorMessage');
+  errorMessage.style.display = 'none';
+
+  // Girdileri al
+  const name = document.getElementById('name').value.trim();
+  const surname = document.getElementById('surname').value.trim();
+  const birthdate = document.getElementById('birthdate').value.trim();
+
+  // DoÄŸum tarihini kontrol et
+  const dateParts = birthdate.split('/');
+  if (dateParts.length !== 3 || dateParts.some(part => isNaN(part))) {
+    errorMessage.textContent = 'LÃ¼tfen geÃ§erli bir tarih formatÄ± girin (GG/AA/YYYY)';
+    errorMessage.style.display = 'block';
+    return;
+  }
+
+  const [day, month, year] = dateParts.map(part => checkValue(part, part.length === 2 ? 31 : 12));
+
+  // HesaplamalarÄ± yap
+  const fullName = `${name} ${surname}`;
+  const numerology = calculateNumerology(fullName);
+  const zodiac = getZodiacSign(parseInt(day), parseInt(month));
+  const [planet, luckyNumber] = getPlanetAndLuckyNumber(zodiac);
+  const stones = suggestNaturalStones(numerology, zodiac);
+
+  // SonuÃ§larÄ± gÃ¶ster
+  const resultsSection = document.getElementById('resultsSection');
+  resultsSection.innerHTML = `
+    <div class="result-card">
+      <h3>KiÅŸisel Bilgiler</h3>
+      <div class="result-item">
+        <span>Ad Soyad:</span>
+        <span>${fullName}</span>
+      </div>
+      <div class="result-item">
+        <span>DoÄŸum Tarihi:</span>
+        <span>${day}/${month}/${year}</span>
+      </div>
+    </div>
+    <div class="result-card">
+      <h3>Astrolojik Analiz</h3>
+      <div class="result-item">
+        <span>BurÃ§:</span>
+        <span>${zodiac}</span>
+      </div>
+      <div class="result-item">
+        <span>Gezegen:</span>
+        <span>${planet}</span>
+      </div>
+      <div class="result-item">
+        <span>UÄŸurlu SayÄ±:</span>
+        <span>${luckyNumber}</span>
+      </div>
+    </div>
+    <div class="result-card">
+      <h3>Ã–nerilen DoÄŸal TaÅŸlar</h3>
+      <div class="stone-list">
+        ${stones.map(stone => `<div class="stone-item">${stone}</div>`).join('')}
+      </div>
+    </div>
+  `;
+
+  resultsSection.classList.add('active');
+});
