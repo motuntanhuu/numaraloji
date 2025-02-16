@@ -47,7 +47,7 @@ const suggestNaturalStones = (numerology, zodiac) => {
     stones.push(zodiacStone);
   }
 
-  return stones.slice(0, 3);
+  return stones;
 };
 
 document.getElementById('birthdate').addEventListener('input', (e) => {
@@ -87,7 +87,7 @@ document.getElementById('analysisForm').addEventListener('submit', (e) => {
     return;
   }
 
-  const [day, month, year] = dateParts.map(part => checkValue(part, part.length === 2 ? 31 : 12));
+  const [day, month, year] = dateParts.map((part, index) => checkValue(part, index === 0 ? 31 : (index === 1 ? 12 : 9999)));
 
   // Hesaplamaları yap
   const fullName = `${name} ${surname}`;
@@ -128,7 +128,7 @@ document.getElementById('analysisForm').addEventListener('submit', (e) => {
     <div class="result-card">
       <h3>Önerilen Doğal Taşlar</h3>
       <div class="stone-list">
-        ${stones.map(stone => `<div class="stone-item">${stone}</div>`).join('')}
+        ${stones.slice(0, 3).map(stone => `<div class="stone-item">${stone}</div>`).join('')}
       </div>
     </div>
   `;
