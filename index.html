@@ -1,337 +1,137 @@
-﻿<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Numeroloji ve Doğal Taş Analizi</title>
-    <style>
-        /* Önceki CSS kodları aynen kalacak */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+import java.util.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
-        body {
-            background: #f0f0f0;
-            padding: 20px;
-        }
+public class NumerologyAnalyzer {
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
+    // ... (calculateNumerology metodu aynı kalacak)
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-size: 2.2em;
-        }
+    // Burçlara göre tüm taşların listesi
+    private static final Map<String, List<String>> ZODIAC_STONES = new HashMap<String, List<String>>() {{
+        put("Koç", Arrays.asList(
+            "Almandin", "Anyolit (Yakutlu Zoisit)", "Bixbite (Kırmızı Beril)", 
+            "Garnet", "Granat (Lal Taşı)", "Hematit", "Kan Taşı (Helyotrop)", 
+            "Karnelyan (Kırmızı Akik)", "Kırmızı Jasper", "Yakut (Ruby)", "Pirit"
+        ));
+        put("Boğa", Arrays.asList(
+            "Ağaç Akik (Dendritic Agate)", "Aragonit", "Botswana Akik", 
+            "Çilek Kuvars", "Krizopras", "Lületaşı", "Malakit", 
+            "Mor Jade (Türkiyenit)", "Oniks", "Yeşil Akik", "Yeşim Taşı (Jade)", "Zümrüt"
+        ));
+        put("İkizler", Arrays.asList(
+            "Akik", "Aleksandrit", "Apatit", "Beril", "Florit", 
+            "Hemimorfit", "Herkimer Elması", "Kavansit", "Kyanit", 
+            "Ortoklaz", "Rutil Kuvars", "Vivianite"
+        ));
+        put("Yengeç", Arrays.asList(
+            "Abalone Kabuğu", "Akik", "Apofilit", "Aytaşı (Moonstone)", 
+            "Dioptaz", "İnci", "Kalsedon", "Klorit Kuvars", 
+            "Larimar", "Sedef", "Zultanit"
+        ));
+        put("Aslan", Arrays.asList(
+            "Anyolit (Yakutlu Zoisit)", "Bronzit", "Elmas", "Güneş Taşı (Sunstone)", 
+            "Heliodor", "Kalkopirit", "Karnelyan (Kırmızı Akik)", 
+            "Lav Taşı", "Peridot", "Pırlanta (Elmas)", "Sitrin"
+        ));
+        put("Başak", Arrays.asList(
+            "Ağaç Akik (Dendritic Agate)", "Amazonit", "Atakamit", 
+            "Jasper", "Kyanit", "Kumtaşı (Arenite)", "Serpantin", "Thulite", 
+            "Yeşil Akik"
+        ));
+        put("Terazi", Arrays.asList(
+            "Akuamarin", "Anjelit (Angelite)", "Aytaşı (Moonstone)", 
+            "Çilek Kuvars", "Diaspor", "Kuvars", "Morganit", "Opal", 
+            "Selenit", "Turmalin", "Zoisit"
+        ));
+        put("Akrep", Arrays.asList(
+            "Aleksandrit", "Almandin", "Ammonit Fosili", "Dumanlı Kuvars", 
+            "Garnet", "Kedi Gözü Taşlar", "Obsidyen", "Oltu Taşı (Jet)", 
+            "Turkuaz", "Yakut (Ruby)"
+        ));
+        put("Yay", Arrays.asList(
+            "Ametrin", "Aventurin", "Epidot", "Lapis Lazuli", 
+            "Lazulite", "Riyolit", "Safir", "Sodalit", "Turmalin", "Zirkon"
+        ));
+        put("Oğlak", Arrays.asList(
+            "Afganit (Afghanite)", "Ammonit Fosili", "Aragonit", 
+            "Hematit", "Larvikite", "Manyetit", "Oniks", "Sodalit", "Zirkon"
+        ));
+        put("Kova", Arrays.asList(
+            "Afganit (Afghanite)", "Amazonit", "Aqua Aura Kuvars", 
+            "Azeztulit Taşı", "Herkimer Elması", "İyolit", 
+            "Moldavit", "Tanzanit", "Terahertz Taşı"
+        ));
+        put("Balık", Arrays.asList(
+            "Abalone Kabuğu", "Akuamarin", "Ametist", 
+            "Anjelit (Angelite)", "Kehribar (Amber)", "Lepidolit", 
+            "Mercan", "Selenit", "Varisit"
+        ));
+    }};
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+    // Numerolojiye göre taşlar
+    private static final Map<Integer, List<String>> NUMEROLOGY_STONES = new HashMap<Integer, List<String>>() {{
+        put(1, Arrays.asList("Elmas", "Yakut", "Kuvars", "Pırlanta", "Granat"));
+        put(2, Arrays.asList("Ay Taşı", "İnci", "Akuamarin", "Sedef", "Larimar"));
+        put(3, Arrays.asList("Ametist", "Turmalin", "Topaz", "Opal", "Kyanit"));
+        put(4, Arrays.asList("Kehribar", "Yeşim", "Obsidyen", "Hematit", "Oniks"));
+        put(5, Arrays.asList("Turkuaz", "Akik", "Sitrin", "Aventurin", "Kalsedon"));
+        put(6, Arrays.asList("Safir", "Zümrüt", "Kuvars", "Morganit", "Malakit"));
+        put(7, Arrays.asList("Kiyanit", "Lapis Lazuli", "Florit", "Selenit", "Amazont"));
+        put(8, Arrays.asList("Oniks", "Kaplan Gözü", "Hematit", "Obsidyen", "Larvikite"));
+        put(9, Arrays.asList("Yakut", "Granat", "Rodonit", "Kırmızı Jasper", "Pirit"));
+    }};
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #34495e;
-            font-weight: 500;
-        }
+    // Doğum tarihinden numeroloji hesapla
+    public static int calculateBirthNumerology(LocalDate date) {
+        int total = date.getDayOfMonth() + date.getMonthValue() + date.getYear();
+        return reduceToSingleDigit(total);
+    }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #bdc3c7;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            width: 100%;
-        }
-
-        button:hover {
-            background: #2980b9;
-        }
-
-        .results {
-            margin-top: 30px;
-            display: none;
-        }
-
-        .results.active {
-            display: block;
-        }
-
-        .result-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .result-card h3 {
-            color: #3498db;
-            margin-bottom: 15px;
-            font-size: 1.4em;
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-        }
-
-        .stone-list {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .stone-item {
-            background: #3498db;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-        }
-
-        .error {
-            color: #e74c3c;
-            margin-bottom: 15px;
-            text-align: center;
-            display: none;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
+    private static int reduceToSingleDigit(int number) {
+        while (number > 9 && number != 11 && number != 22 && number != 33) {
+            int sum = 0;
+            while (number > 0) {
+                sum += number % 10;
+                number /= 10;
             }
-            
-            h1 {
-                font-size: 1.8em;
-            }
+            number = sum;
         }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Numeroloji ve Doğal Taş Analizi</h1>
-        <div class="error" id="errorMessage"></div>
+        return number;
+    }
+
+    // Önerilen taşları bul
+    public static List<String> suggestStones(int nameNum, int birthNum, String zodiac) {
+        List<String> zodiacStones = ZODIAC_STONES.getOrDefault(zodiac, new ArrayList<>());
+        List<String> nameStones = NUMEROLOGY_STONES.getOrDefault(nameNum, new ArrayList<>());
+        List<String> birthStones = NUMEROLOGY_STONES.getOrDefault(birthNum, new ArrayList<>());
+
+        // Ortak taşları bul
+        Set<String> common = new HashSet<>(nameStones);
+        common.retainAll(birthStones);
         
-        <form id="analysisForm">
-            <div class="form-group">
-                <label for="name">Adınız</label>
-                <input type="text" id="name" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="surname">Soyadınız</label>
-                <input type="text" id="surname" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="birthdate">Doğum Tarihiniz (GG/AA/YYYY)</label>
-                <input type="text" id="birthdate" placeholder="Örnek: 15/05/1990" required>
-            </div>
-            
-            <button type="submit">Analiz Et</button>
-        </form>
+        // Tüm taşları birleştir
+        Set<String> allStones = new LinkedHashSet<>();
+        allStones.addAll(common);
+        allStones.addAll(zodiacStones);
+        allStones.addAll(nameStones);
+        allStones.addAll(birthStones);
 
-        <div class="results" id="resultsSection">
-            <!-- Sonuçlar burada gösterilecek -->
-        </div>
-    </div>
+        return new ArrayList<>(allStones).subList(0, Math.min(allStones.size(), 5));
+    }
 
-    <script>
-        // Numeroloji Hesaplama Fonksiyonu
-        function calculateNumerology(name) {
-            const numerologyMap = {
-                'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7, 'H': 8, 'I': 9,
-                'J': 1, 'K': 2, 'L': 3, 'M': 4, 'N': 5, 'O': 6, 'P': 7, 'Q': 8, 'R': 9,
-                'S': 1, 'T': 2, 'U': 3, 'V': 4, 'W': 5, 'X': 6, 'Y': 7, 'Z': 8
-            };
+    // ... (getZodiacSign ve getPlanetAndSoulNumber metodları aynı kalacak)
 
-            let total = 0;
-            name.toUpperCase().split('').forEach(char => {
-                if (/[A-Z]/.test(char)) {
-                    total += numerologyMap[char] || 0;
-                }
-            });
+    public static void main(String[] args) {
+        // ... (main metodunun başlangıcı aynı)
 
-            while (total > 9 && ![11, 22, 33].includes(total)) {
-                total = String(total).split('').reduce((acc, digit) => acc + parseInt(digit), 0);
-            }
-            return total;
-        }
+            int nameNum = calculateNumerology(fullName);
+            int birthNum = calculateBirthNumerology(birthDate);
+            List<String> stones = suggestStones(nameNum, birthNum, zodiacSign);
 
-        // Burç Hesaplama Fonksiyonu
-        function getZodiacSign(day, month) {
-            const cutoffs = [120, 219, 320, 420, 521, 621, 722, 823, 923, 1023, 1122, 1222, 1231];
-            const signs = ["Oğlak", "Kova", "Balık", "Koç", "Boğa", "İkizler", 
-                         "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak"];
-            
-            const dateNumber = month * 100 + day;
-            for (let i = 0; i < cutoffs.length; i++) {
-                if (dateNumber <= cutoffs[i]) {
-                    return signs[i];
-                }
-            }
-            return "Oğlak";
-        }
+            // Çıktı kısmında "Uğurlu Sayı" yerine "Ruh Sayısı" yaz
+            System.out.println("Ruh Sayısı: " + soulNumber);
 
-        // Gezegen ve Şanslı Numarası
-        function getPlanetAndLuckyNumber(zodiac) {
-            const zodiacData = {
-                "Koç": ["Mars", 9],
-                "Boğa": ["Venüs", 6],
-                "İkizler": ["Merkür", 5],
-                "Yengeç": ["Ay", 2],
-                "Aslan": ["Güneş", 1],
-                "Başak": ["Merkür", 5],
-                "Terazi": ["Venüs", 6],
-                "Akrep": ["Mars", 9],
-                "Yay": ["Jüpiter", 3],
-                "Oğlak": ["Satürn", 8],
-                "Kova": ["Uranüs", 4],
-                "Balık": ["Neptün", 7]
-            };
-            return zodiacData[zodiac] || ["Bilinmiyor", 0];
-        }
-
-        // Doğal Taş Önerileri
-        function suggestNaturalStones(numerology, zodiac) {
-            const stoneData = {
-                1: ["Elmas", "Yakut", "Kuvars"],
-                2: ["Ay Taşı", "İnci", "Akuamarin"],
-                3: ["Ametist", "Turmalin", "Topaz"],
-                4: ["Kehribar", "Yeşim", "Obsidyen"],
-                5: ["Turkuaz", "Akik", "Sitrin"],
-                6: ["Safir", "Zümrüt", "Kuvars"],
-                7: ["Kiyanit", "Lapis Lazuli", "Florit"],
-                8: ["Oniks", "Kaplan Gözü", "Hematit"],
-                9: ["Yakut", "Granat", "Rodonit"],
-            };
-
-            const zodiacStones = {
-                "Koç": "Yakut",
-                "Boğa": "Zümrüt",
-                "İkizler": "Akik",
-                "Yengeç": "Ay Taşı",
-                "Aslan": "Elmas",
-                "Başak": "Sitrin",
-                "Terazi": "Safir",
-                "Akrep": "Topaz",
-                "Yay": "Turkuaz",
-                "Oğlak": "Oniks",
-                "Kova": "Akuamarin",
-                "Balık": "Ametist"
-            };
-
-            const stones = [...stoneData[numerology] || []];
-            const zodiacStone = zodiacStones[zodiac];
-            
-            if (zodiacStone && !stones.includes(zodiacStone)) {
-                stones.push(zodiacStone);
-            }
-            return stones.slice(0, 3);
-        }
-
-        // Form Submit İşleyici
-        document.getElementById('analysisForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.style.display = 'none';
-
-            // Girdileri al
-            const name = document.getElementById('name').value.trim();
-            const surname = document.getElementById('surname').value.trim();
-            const birthdate = document.getElementById('birthdate').value.trim();
-
-            // Doğum tarihini kontrol et
-            const dateParts = birthdate.split('/');
-            if (dateParts.length !== 3 || dateParts.some(part => isNaN(part))) {
-                errorMessage.textContent = "Lütfen geçerli bir tarih formatı girin (GG/AA/YYYY)";
-                errorMessage.style.display = 'block';
-                return;
-            }
-
-            const day = parseInt(dateParts[0]);
-            const month = parseInt(dateParts[1]);
-            const year = parseInt(dateParts[2]);
-
-            // Hesaplamaları yap
-            const fullName = `${name} ${surname}`;
-            const numerology = calculateNumerology(fullName);
-            const zodiac = getZodiacSign(day, month);
-            const [planet, luckyNumber] = getPlanetAndLuckyNumber(zodiac);
-            const stones = suggestNaturalStones(numerology, zodiac);
-
-            // Sonuçları göster
-            const resultsSection = document.getElementById('resultsSection');
-            resultsSection.innerHTML = `
-                <div class="result-card">
-                    <h3>Kişisel Bilgiler</h3>
-                    <div class="result-item">
-                        <span>Ad Soyad:</span>
-                        <span>${fullName}</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Doğum Tarihi:</span>
-                        <span>${birthdate}</span>
-                    </div>
-                </div>
-
-                <div class="result-card">
-                    <h3>Astrolojik Analiz</h3>
-                    <div class="result-item">
-                        <span>Burç:</span>
-                        <span>${zodiac}</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Gezegen:</span>
-                        <span>${planet}</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Uğurlu Sayı:</span>
-                        <span>${luckyNumber}</span>
-                    </div>
-                </div>
-
-                <div class="result-card">
-                    <h3>Önerilen Doğal Taşlar</h3>
-                    <div class="stone-list">
-                        ${stones.map(stone => `<div class="stone-item">${stone}</div>`).join('')}
-                    </div>
-                </div>
-            `;
-
-            resultsSection.classList.add('active');
-        });
-    </script>
-</body>
-</html>
+        // ... (main metodu sonu aynı)
+    }
+}
