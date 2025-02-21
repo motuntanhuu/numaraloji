@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numeroloji ve Doðal Taþ Analizi</title>
+    <style>
+        /* CSS kodlarý ayný kalacak */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Numeroloji ve Doðal Taþ Analizi</h1>
+        <div class="error" id="errorMessage"></div>
+        
+        <form id="analysisForm">
+            <!-- Form alanlarý ayný kalacak -->
+        </form>
+
+        <div class="results" id="resultsSection">
+            <!-- Sonuçlar burada gösterilecek -->
+        </div>
+    </div>
+
+    <script>
+        // Güncellenmiþ JavaScript kodlarý
+        const ZODIAC_STONES = {
+            "Koç": ["Almandin", "Anyolit (Yakutlu Zoisit)", "Bixbite (Kýrmýzý Beril)", "Garnet", "Granat (Lal Taþý)", "Hematit", "Kan Taþý (Helyotrop)", "Karnelyan (Kýrmýzý Akik)", "Kýrmýzý Jasper", "Yakut (Ruby)", "Pirit"],
+            "Boða": ["Aðaç Akik (Dendritic Agate)", "Aragonit", "Botswana Akik", "Çilek Kuvars", "Krizopras", "Lületaþý", "Malakit", "Mor Jade (Türkiyenit)", "Oniks", "Yeþil Akik", "Yeþim Taþý (Jade)", "Zümrüt"],
+            "Ýkizler": ["Akik", "Aleksandrit", "Apatit", "Beril", "Florit", "Hemimorfit", "Herkimer Elmasý", "Kavansit", "Kyanit", "Ortoklaz", "Rutil Kuvars", "Vivianite"],
+            "Yengeç": ["Abalone Kabuðu", "Akik", "Apofilit", "Aytaþý (Moonstone)", "Dioptaz", "Ýnci", "Kalsedon", "Klorit Kuvars", "Larimar", "Sedef", "Zultanit"],
+            "Aslan": ["Anyolit (Yakutlu Zoisit)", "Bronzit", "Elmas", "Güneþ Taþý (Sunstone)", "Heliodor", "Kalkopirit", "Karnelyan (Kýrmýzý Akik)", "Lav Taþý", "Peridot", "Pýrlanta (Elmas)", "Sitrin"],
+            "Baþak": ["Aðaç Akik (Dendritic Agate)", "Amazonit", "Atakamit", "Jasper", "Kyanit", "Kumtaþý (Arenite)", "Serpantin", "Thulite", "Yeþil Akik"],
+            "Terazi": ["Akuamarin", "Anjelit (Angelite)", "Aytaþý (Moonstone)", "Çilek Kuvars", "Diaspor", "Kuvars", "Morganit", "Opal", "Selenit", "Turmalin", "Zoisit"],
+            "Akrep": ["Aleksandrit", "Almandin", "Ammonit Fosili", "Dumanlý Kuvars", "Garnet", "Kedi Gözü Taþlar", "Obsidyen", "Oltu Taþý (Jet)", "Turkuaz", "Yakut (Ruby)"],
+            "Yay": ["Ametrin", "Aventurin", "Epidot", "Lapis Lazuli", "Lazulite", "Riyolit", "Safir", "Sodalit", "Turmalin", "Zirkon"],
+            "Oðlak": ["Afganit (Afghanite)", "Ammonit Fosili", "Aragonit", "Hematit", "Larvikite", "Manyetit", "Oniks", "Sodalit", "Zirkon"],
+            "Kova": ["Afganit (Afghanite)", "Amazonit", "Aqua Aura Kuvars", "Azeztulit Taþý", "Herkimer Elmasý", "Ýyolit", "Moldavit", "Tanzanit", "Terahertz Taþý"],
+            "Balýk": ["Abalone Kabuðu", "Akuamarin", "Ametist", "Anjelit (Angelite)", "Kehribar (Amber)", "Lepidolit", "Mercan", "Selenit", "Varisit"]
+        };
+
+        const NUMEROLOGY_STONES = {
+            1: ["Elmas", "Yakut", "Kuvars", "Pýrlanta", "Granat"],
+            2: ["Ay Taþý", "Ýnci", "Akuamarin", "Sedef", "Larimar"],
+            3: ["Ametist", "Turmalin", "Topaz", "Opal", "Kyanit"],
+            4: ["Kehribar", "Yeþim", "Obsidyen", "Hematit", "Oniks"],
+            5: ["Turkuaz", "Akik", "Sitrin", "Aventurin", "Kalsedon"],
+            6: ["Safir", "Zümrüt", "Kuvars", "Morganit", "Malakit"],
+            7: ["Kiyanit", "Lapis Lazuli", "Florit", "Selenit", "Amazont"],
+            8: ["Oniks", "Kaplan Gözü", "Hematit", "Obsidyen", "Larvikite"],
+            9: ["Yakut", "Granat", "Rodonit", "Kýrmýzý Jasper", "Pirit"]
+        };
+
+        function calculateBirthNumerology(date) {
+            const total = date.getDate() + (date.getMonth() + 1) + date.getFullYear();
+            return reduceToSingleDigit(total);
+        }
+
+        function reduceToSingleDigit(number) {
+            while (number > 9 && ![11, 22, 33].includes(number)) {
+                number = String(number).split('').reduce((acc, digit) => acc + parseInt(digit), 0);
+            }
+            return number;
+        }
+
+        function suggestStones(nameNum, birthNum, zodiac) {
+            const zodiacStones = ZODIAC_STONES[zodiac] || [];
+            const nameStones = NUMEROLOGY_STONES[nameNum] || [];
+            const birthStones = NUMEROLOGY_STONES[birthNum] || [];
+
+            // Ortak taþlarý bul
+            const commonStones = [...new Set(nameStones.filter(stone => birthStones.includes(stone)))];
+            
+            // Tüm taþlarý birleþtir
+            const allStones = [
+                ...commonStones,
+                ...zodiacStones,
+                ...nameStones,
+                ...birthStones
+            ];
+
+            // Tekilleþtir ve 5 taþ seç
+            return [...new Set(allStones)].slice(0, 5);
+        }
+
+        document.getElementById('analysisForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // ... (Önceki validasyon kodlarý ayný kalacak)
+
+            // Hesaplamalarý yap
+            const birthDate = new Date(year, month - 1, day);
+            const nameNum = calculateNumerology(fullName);
+            const birthNum = calculateBirthNumerology(birthDate);
+            const zodiac = getZodiacSign(day, month);
+            const stones = suggestStones(nameNum, birthNum, zodiac);
+            const [planet, soulNumber] = getPlanetAndLuckyNumber(zodiac);
+
+            // Sonuçlarý göster
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.innerHTML = `
+                <!-- ... Diðer sonuç alanlarý ayný kalacak -->
+                <div class="result-item">
+                    <span>Ruh Sayýsý:</span>
+                    <span>${soulNumber}</span>
+                </div>
+                <!-- ... -->
+            `;
+            
+            resultsSection.classList.add('active');
+        });
+    </script>
+</body>
+</html>
